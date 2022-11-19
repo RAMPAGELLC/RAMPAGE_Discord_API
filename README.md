@@ -8,7 +8,7 @@ _to be made, badgers can work with these, however requires some re-working_
 
 # Visitor Count
 
-<img src="https://profile-counter.glitch.me/Badger_Discord_API/count.svg" />
+<img src="https://profile-counter.glitch.me/RAMPAGE_Discord_API/count.svg" />
 
 # Documentation
 

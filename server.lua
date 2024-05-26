@@ -226,6 +226,25 @@ function GetDiscordRoles(PlayerId, GuildId)
 end
 
 -- Public Function
+-- @exports.RAMPAGE_Discord_API.HasDiscordRole(PlayerId, RoleId, GuildId (optional))
+-- returns boolean
+function HasDiscordRole(PlayerId, RoleId, GuildId)
+	local suc, roles = GetDiscordRoles(PlayerId, GuildId or 1)
+
+	if not suc then
+		return false
+	end
+
+	for i,v in pairs(roles) do
+		if v == tonumber(RoleId) then
+			return true
+		end
+	end
+
+	return false
+end
+
+-- Public Function
 -- @exports.RAMPAGE_Discord_API.GetDiscordUsername(PlayerId, SendAsTable (optional))
 -- returns success boolean & string
 function GetDiscordUsername(PlayerId, SendAsTable)

@@ -16,19 +16,15 @@ server_scripts {
 }
 
 server_exports {
-    -- API
 	"DiscordRequest",
     "CheckEqual",
-
-    -- Cache
     "PurgeCache",
-
-    -- User
     "GetDiscordUsername",
 	"GetDiscordRoles",
     "GetDiscordId",
-
-    -- Guild
+    "GetDiscordAvatar",
+    "HasDiscordRole",
+    "GetRoleNameFromRoleId",
     "FetchRoleId",
     "GetRoleIdFromRoleName",
     "GetGuildRoleList",

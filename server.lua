@@ -102,7 +102,7 @@ function GetIdentifier(source, id_type)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.GetDiscordId()
+-- @exports["RAMPAGE_Discord_API"]:GetDiscordId()
 -- returns boolean success, discord license
 function GetDiscordId(PlayerId)
 	local id = GetIdentifier(PlayerId, "discord")
@@ -110,7 +110,7 @@ function GetDiscordId(PlayerId)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.PurgeCache()
+-- @exports["RAMPAGE_Discord_API"]:PurgeCache()
 -- returns boolean success
 function PurgeCache()
 	DataCache = {
@@ -123,8 +123,8 @@ function PurgeCache()
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.DiscordRequest(method, endpoint, jsondata)
--- example: print(exports.RAMPAGE_Discord_API.DiscordRequest("GET", "guilds/1", {}))
+-- @exports["RAMPAGE_Discord_API"]:DiscordRequest(method, endpoint, jsondata)
+-- example: print(exports["RAMPAGE_Discord_API"]:DiscordRequest("GET", "guilds/1", {}))
 function DiscordRequest(method, endpoint, jsondata)
 	local data = nil
 
@@ -153,9 +153,14 @@ function DiscordRequest(method, endpoint, jsondata)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.GetGuildRoleList(GuildId (optional))
+-- @exports["RAMPAGE_Discord_API"]:GetGuildRoleList(guildAlias: string (optional))
 -- returns success boolean & roles array.
-function GetGuildRoleList(GuildId)
+function GetGuildRoleList(guildAlias)
+	if guildAlias ~= nil and type(guildAlias) ~= "string" then
+		print("RAMPAGE_Discord_API: guildAlias must be a string.")
+		return false, ""
+	end
+
 	local guildId = GetGuildId(GuildId)
 
 	if Config.UseCache and DataCache.RoleList[guildId] ~= nil then
@@ -175,6 +180,7 @@ function GetGuildRoleList(GuildId)
 	local data = json.decode(guild.data)
 	local roles = data.roles
 	local roleList = {}
+
 	for i = 1, #roles do
 		roleList[roles[i].name] = roles[i].id
 	end
@@ -187,12 +193,22 @@ function GetGuildRoleList(GuildId)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.GetDiscordRoles(PlayerId, GuildId (optional))
--- example: print(exports.RAMPAGE_Discord_API.GetDiscordRoles(1, 123))
+-- @exports["RAMPAGE_Discord_API"]:GetDiscordRoles(PlayerId: number, guildAlias: string (optional))
+-- example: print(exports["RAMPAGE_Discord_API"]:GetDiscordRoles(1, 123))
 -- returns success boolean & roles array.
-function GetDiscordRoles(PlayerId, GuildId)
+function GetDiscordRoles(PlayerId, guildAlias)
+	if PlayerId == nil or PlayerId ~= nil and type(PlayerId) ~= "number" then
+		print("RAMPAGE_Discord_API: PlayerId must be a number and not nil.")
+		return false, ""
+	end
+
+	if guildAlias ~= nil and type(guildAlias) ~= "string" then
+		print("RAMPAGE_Discord_API: guildAlias must be a string.")
+		return false, ""
+	end
+
 	local ids, discordId = GetDiscordId(PlayerId)
-	local guildId = GetGuildId(GuildId or 1)
+	local guildId = GetGuildId(guildAlias)
 
 	if not ids then
 		return false, {}
@@ -226,28 +242,53 @@ function GetDiscordRoles(PlayerId, GuildId)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.HasDiscordRole(PlayerId, RoleId, GuildId (optional))
+-- @exports["RAMPAGE_Discord_API"]:HasDiscordRole(PlayerId: number, RoleId: number, guildAlias: string (optional))
 -- returns boolean
-function HasDiscordRole(PlayerId, RoleId, GuildId)
-	local suc, roles = GetDiscordRoles(PlayerId, GuildId or 1)
-
-	if not suc then
-		return false
+function HasDiscordRole(PlayerId, RoleId, guildAlias)
+	if PlayerId == nil or PlayerId ~= nil and type(PlayerId) ~= "number" then
+		print("RAMPAGE_Discord_API: PlayerId must be a number and not nil.")
+		return false, ""
 	end
 
-	for i,v in pairs(roles) do
-		if v == tonumber(RoleId) then
-			return true
+	if RoleId == nil or RoleId ~= nil and type(RoleId) ~= "number" then
+		print("RAMPAGE_Discord_API: RoleId must be a number and not nil.")
+		return false, ""
+	end
+
+	if guildAlias ~= nil and type(guildAlias) ~= "string" then
+		print("RAMPAGE_Discord_API: guildAlias must be a string.")
+		return false, ""
+	end
+
+	local suc, roles = GetDiscordRoles(PlayerId, guildAlias)
+	local roleFound = false
+
+	if suc then
+		for i, v in pairs(roles) do
+			if tonumber(v) == tonumber(RoleId) then
+				print("Found role!")
+				roleFound = true
+				break
+			end
 		end
 	end
 
-	return false
+	return roleFound
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.GetDiscordUsername(PlayerId, SendAsTable (optional))
+-- @exports["RAMPAGE_Discord_API"]:GetDiscordUsername(PlayerId: number, SendAsTable: boolean (optional))
 -- returns success boolean & string
 function GetDiscordUsername(PlayerId, SendAsTable)
+	if PlayerId == nil or PlayerId ~= nil and type(PlayerId) ~= "number" then
+		print("RAMPAGE_Discord_API: PlayerId must be a number and not nil.")
+		return false, ""
+	end
+
+	if SendAsTable == nil then
+		SendAsTable = false
+	end
+
 	local ids, discordId = GetDiscordId(PlayerId)
 	local nameData = nil
 
@@ -267,9 +308,6 @@ function GetDiscordUsername(PlayerId, SendAsTable)
 	if data == nil then
 		return false, "Discord"
 	end
-	if SendAsTable == nil then
-		SendAsTable = false
-	end
 
 	if SendAsTable then
 		return true, {
@@ -282,10 +320,15 @@ function GetDiscordUsername(PlayerId, SendAsTable)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.GetGuildIcon(GuildId (optional))
+-- @exports["RAMPAGE_Discord_API"]:GetGuildIcon(guildAlias: string (optional))
 -- returns success boolean & string
-function GetGuildIcon(guild)
-	local guildId = GetGuildId(guild)
+function GetGuildIcon(guildAlias)
+	if guildAlias ~= nil and type(guildAlias) ~= "string" then
+		print("RAMPAGE_Discord_API: guildAlias must be a string.")
+		return false, ""
+	end
+
+	local guildId = GetGuildId(guildAlias)
 	guild = DiscordRequest("GET", "guilds/" .. guildId, {})
 
 	if guild.code ~= 200 then
@@ -301,10 +344,15 @@ function GetGuildIcon(guild)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.GetGuildSplash(GuildId (optional))
+-- @exports["RAMPAGE_Discord_API"]:GetGuildSplash(guildAlias: string (optional))
 -- returns success boolean & string
-function GetGuildSplash(guild)
-	local guildId = GetGuildId(guild)
+function GetGuildSplash(guildAlias)
+	if guildAlias ~= nil and type(guildAlias) ~= "string" then
+		print("RAMPAGE_Discord_API: guildAlias must be a string.")
+		return false, ""
+	end
+
+	local guildId = GetGuildId(guildAlias)
 	guild = DiscordRequest("GET", "guilds/" .. guildId, {})
 
 	if guild.code ~= 200 then
@@ -316,10 +364,15 @@ function GetGuildSplash(guild)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.GetGuildName(GuildId (optional))
+-- @exports["RAMPAGE_Discord_API"]:GetGuildName(guildAlias: string (optional))
 -- returns success boolean & string
-function GetGuildName(guild)
-	local guildId = GetGuildId(guild)
+function GetGuildName(guildAlias)
+	if guildAlias ~= nil and type(guildAlias) ~= "string" then
+		print("RAMPAGE_Discord_API: guildAlias must be a string.")
+		return false, ""
+	end
+
+	local guildId = GetGuildId(guildAlias)
 	guild = DiscordRequest("GET", "guilds/" .. guildId, {})
 
 	if guild.code ~= 200 then
@@ -331,10 +384,15 @@ function GetGuildName(guild)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.GetGuildDescription(GuildId (optional))
+-- @exports["RAMPAGE_Discord_API"]:GetGuildDescription(guildAlias: string (optional))
 -- returns success boolean & string
-function GetGuildDescription(guild)
-	local guildId = GetGuildId(guild)
+function GetGuildDescription(guildAlias)
+	if guildAlias ~= nil and type(guildAlias) ~= "string" then
+		print("RAMPAGE_Discord_API: guildAlias must be a string.")
+		return false, ""
+	end
+
+	local guildId = GetGuildId(guildAlias)
 	guild = DiscordRequest("GET", "guilds/" .. guildId, {})
 
 	if guild.code ~= 200 then
@@ -346,10 +404,15 @@ function GetGuildDescription(guild)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.GetGuildMemberCount(GuildId (optional))
+-- @exports["RAMPAGE_Discord_API"]:GetGuildMemberCount(guildAlias: string (optional))
 -- returns success boolean & count
-function GetGuildMemberCount(guild)
-	local guildId = GetGuildId(guild)
+function GetGuildMemberCount(guildAlias)
+	if guildAlias ~= nil and type(guildAlias) ~= "string" then
+		print("RAMPAGE_Discord_API: guildAlias must be a string.")
+		return false, 0
+	end
+
+	local guildId = GetGuildId(guildAlias)
 	guild = DiscordRequest("GET", "guilds/" .. guildId .. "?with_counts=true", {})
 
 	if guild.code ~= 200 then
@@ -361,10 +424,15 @@ function GetGuildMemberCount(guild)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.GetGuildOnlineMemberCount(GuildId (optional))
+-- @exports["RAMPAGE_Discord_API"]:GetGuildOnlineMemberCount(guildAlias: string (optional))
 -- returns success boolean & count
-function GetGuildOnlineMemberCount(guild)
-	local guildId = GetGuildId(guild)
+function GetGuildOnlineMemberCount(guildAlias)
+	if guildAlias ~= nil and type(guildAlias) ~= "string" then
+		print("RAMPAGE_Discord_API: guildAlias must be a string.")
+		return false, 0
+	end
+
+	local guildId = GetGuildId(guildAlias)
 	guild = DiscordRequest("GET", "guilds/" .. guildId .. "?with_counts=true", {})
 
 	if guild.code ~= 200 then
@@ -376,9 +444,14 @@ function GetGuildOnlineMemberCount(guild)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.GetDiscordAvatar(PlayerId)
+-- @exports["RAMPAGE_Discord_API"]:GetDiscordAvatar(PlayerId: number)
 -- returns success boolean & image url
 function GetDiscordAvatar(PlayerId)
+	if PlayerId == nil or PlayerId ~= nil and type(PlayerId) ~= "number" then
+		print("RAMPAGE_Discord_API: PlayerId must be a number and not nil.")
+		return false, ""
+	end
+
 	local ids, discordId = GetDiscordId(PlayerId)
 
 	if not ids then
@@ -420,39 +493,110 @@ function GetDiscordAvatar(PlayerId)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.GetRoleIdFromRoleName(RoleName, GuildId (optional))
--- returns boolean & roleid
-function GetRoleIdFromRoleName(name, guild)
-	local guildId = GetGuildId(guild)
-
-	if Config.UseCache and DataCache.RoleList[guildId] ~= nil then
-		return true, DataCache.RoleList[guildId][name]
+-- @exports["RAMPAGE_Discord_API"]:GetRoleNameFromRoleId(roleId: number, guildAlias: string (optional))
+-- returns boolean & role name
+function GetRoleNameFromRoleId(roleId, guildAlias)
+	if roleId == nil or roleId ~= nil and type(roleId) ~= "number" then
+		print("RAMPAGE_Discord_API: roleId must be a number and not nil.")
+		return false, ""
 	end
 
-	if type(name) == "number" then
-		return true, tonumber(name)
+	if guildAlias ~= nil and type(guildAlias) ~= "string" then
+		print("RAMPAGE_Discord_API: guildAlias must be a string.")
+		return false, ""
+	end
+
+	local guildId = GetGuildId(guildAlias)
+	local s, roles = false, {}
+
+	if Config.UseCache and DataCache.RoleList[guildId] ~= nil then
+		roles = DataCache.RoleList[guildId][roleName]
+	else
+		s, roles = GetGuildRoleList(guild)
+
+		if not s then
+			return false, ""
+		end
+	end
+
+	for name, id in pairs(roles) do
+		if id == roleId then
+			return true, name
+		end
+	end
+	
+	return false, ""
+end
+
+-- Public Function
+-- @exports["RAMPAGE_Discord_API"]:GetRoleIdFromRoleName(roleName: string, guildAlias: string (optional))
+-- returns boolean & roleid
+function GetRoleIdFromRoleName(roleName, guildAlias)
+	if roleName == nil then
+		print("RAMPAGE_Discord_API: roleName must be a string and not nil.")
+		return false, 1
+	end
+
+	if type(roleName) ~= "string" then
+		print("RAMPAGE_Discord_API: roleName must be a string.")
+		return false, 1
+	end
+
+	if guildAlias ~= nil and type(guildAlias) ~= "string" then
+		print("RAMPAGE_Discord_API: guildAlias must be a string.")
+		return false, 1
+	end
+
+	local guildId = GetGuildId(guildAlias)
+
+	if Config.UseCache and DataCache.RoleList[guildId] ~= nil then
+		return true, DataCache.RoleList[guildId][roleName]
+	end
+
+	if type(roleName) == "number" then
+		return true, tonumber(roleName)
 	end
 
 	local s, roles = GetGuildRoleList(guild)
+
 	if not s then
 		return false, 1
 	end
 
-	return true, tonumber(roles[name])
+	return true, tonumber(roles[roleName])
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.FetchRoleId(RoleId, GuildId (optional))
+-- @exports["RAMPAGE_Discord_API"]:FetchRoleId(roleId: number, guildAlias: string (optional))
 -- returns boolean & roleid
-function FetchRoleId(RoleId, GuildId)
-	return GetRoleIdFromRoleName(RoleId, GuildId)
+function FetchRoleId(RoleId, guildAlias)
+	print(
+		"RAMPAGE_Discord_API: FetchRoleId has been deprecated in RAMPAGE Discord API v3, please use GetRoleIdFromRoleName."
+	)
+	return GetRoleIdFromRoleName(RoleId, guildAlias)
 end
 
 -- Public Function
--- @exports.RAMPAGE_Discord_API.CheckEqual(Role1, Role2, GuildId (optional))
-function CheckEqual(role1, role2, guild)
-	local s, roleID1 = FetchRoleId(role1, guild)
-	local s2, roleID2 = FetchRoleId(role2, guild)
+-- @exports["RAMPAGE_Discord_API"]:CheckEqual(role1: number, role2: number, guildAlias: string (optional))
+-- returns boolean
+function CheckEqual(role1, role2, guildAlias)
+	if role1 == nil or role1 ~= nil and type(role1) ~= "number" then
+		print("RAMPAGE_Discord_API: role1 must be a number and not nil.")
+		return false
+	end
+
+	if role2 == nil or role2 ~= nil and type(role2) ~= "number" then
+		print("RAMPAGE_Discord_API: role2 must be a number and not nil.")
+		return false
+	end
+
+	if guildAlias ~= nil and type(guildAlias) ~= "string" then
+		print("RAMPAGE_Discord_API: guildAlias must be a string.")
+		return false
+	end
+
+	local s, roleID1 = GetRoleIdFromRoleName(role1, guildAlias)
+	local s2, roleID2 = GetRoleIdFromRoleName(role2, guildAlias)
 
 	if not s or not s2 then
 		return false
@@ -489,6 +633,7 @@ end)
 RegisterNetEvent("RAMPAGE_Discord_API:LoadPlayer")
 AddEventHandler("RAMPAGE_Discord_API:LoadPlayer", function()
 	local src = source
+
 	if GetCurrentResourceName() ~= "RAMPAGE_Discord_API" then
 		print(
 			RN .. "IMPORTANT: Resource MUST be named RAMPAGE_Discord_API otherwise some scripts may NOT work properly."
@@ -510,7 +655,7 @@ AddEventHandler("RAMPAGE_Discord_API:LoadPlayer", function()
 			local success, discordId = GetDiscordId(src)
 
 			if not success then
-			--	print("Failed to find discord!")
+				--	print("Failed to find discord!")
 				return
 			end
 
@@ -523,13 +668,15 @@ AddEventHandler("RAMPAGE_Discord_API:LoadPlayer", function()
 
 				for _, roleId in pairs(roles) do
 					if not has_value(DataCache.UserRoles[discordId], roleId) then
-						table.insert(added, roleId)
+						local suc, name = GetRoleNameFromRoleId(roleId)
+						table.insert(added, suc and name or roleId)
 					end
 				end
 
 				for _, roleId in pairs(DataCache.UserRoles[discordId]) do
 					if not has_value(roles, roleId) then
-						table.insert(removed, roleId)
+						local suc, name = GetRoleNameFromRoleId(roleId)
+						table.insert(removed, suc and name or roleId)
 					end
 				end
 

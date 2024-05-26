@@ -11,7 +11,8 @@ client_scripts {
 }
 
 server_scripts {
-	'config.lua',
+	"version.lua",
+	"config.lua",
 	"server.lua",
 }
 

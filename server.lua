@@ -68,7 +68,7 @@ end
 -- returns Guild Id, Defaults to default guild id if non-found.
 function GetGuildId(GuildName)
 	if type(GuildName) == "number" then
-		return GuildName;
+		return GuildName
 	end
 
 	local result = Config.GuildId
@@ -88,7 +88,7 @@ function GetIdentifier(source, id_type)
 	local ids = GetPlayerIdentifiers(source)
 
 	if GetConvarInt("sv_fxdkMode", 0) == 1 then
-		print("fxDK MODE DETECTED. PASSING FAKE IDENTIFERS. MODIFY WITH YOUR OWN IN LINE 84.")
+		print("fxDK MODE DETECTED. PASSING FAKE IDENTIFERS. MODIFY WITH YOUR OWN IN LINE 91.")
 		table.insert(ids, "steam:76561198054464303")
 		table.insert(ids, "discord:295744013406044162")
 		table.insert(ids, "live:test")
@@ -161,7 +161,7 @@ end
 -- returns success boolean & roles array.
 function GetGuildRoleList(guildAlias)
 	if guildAlias ~= nil and type(guildAlias) ~= "string" and type(guildAlias) ~= "number" then
-		print("RAMPAGE_Discord_API: guildAlias must be a string or number.")
+		print("RAMPAGE_Discord_API - GetGuildRoleList: guildAlias must be a string or number.")
 		return false, ""
 	end
 
@@ -202,12 +202,12 @@ end
 -- returns success boolean & roles array.
 function GetDiscordRoles(PlayerId, guildAlias)
 	if PlayerId == nil or PlayerId ~= nil and type(PlayerId) ~= "number" then
-		print("RAMPAGE_Discord_API: PlayerId must be a number and not nil.")
+		print("RAMPAGE_Discord_API - GetDiscordRoles: PlayerId must be a number and not nil.")
 		return false, ""
 	end
 
 	if guildAlias ~= nil and type(guildAlias) ~= "string" and type(guildAlias) ~= "number" then
-		print("RAMPAGE_Discord_API: guildAlias must be a string or number.")
+		print("RAMPAGE_Discord_API - GetDiscordRoles: guildAlias must be a string or number.")
 		return false, ""
 	end
 
@@ -231,7 +231,6 @@ function GetDiscordRoles(PlayerId, guildAlias)
 
 	local data = json.decode(member.data)
 	local roles = data.roles
-	local found = true
 
 	if Config.UseCache then
 		DataCache.UserRoles[discordId] = DataCache.UserRoles[discordId] or {}
@@ -250,12 +249,12 @@ end
 -- returns boolean
 function HasDiscordRole(PlayerId, RoleId, guildAlias)
 	if PlayerId == nil or PlayerId ~= nil and type(PlayerId) ~= "number" then
-		print("RAMPAGE_Discord_API: PlayerId must be a number and not nil.")
+		print("RAMPAGE_Discord_API - HasDiscordRole: PlayerId must be a number and not nil.")
 		return false, ""
 	end
 
 	if RoleId == nil or RoleId ~= nil and type(RoleId) ~= "number" then
-		print("RAMPAGE_Discord_API: RoleId must be a number and not nil.")
+		print("RAMPAGE_Discord_API - HasDiscordRole: RoleId must be a number and not nil.")
 		return false, ""
 	end
 
@@ -270,7 +269,6 @@ function HasDiscordRole(PlayerId, RoleId, guildAlias)
 	if suc then
 		for i, v in pairs(roles) do
 			if tonumber(v) == tonumber(RoleId) then
-				print("Found role!")
 				roleFound = true
 				break
 			end
@@ -285,7 +283,7 @@ end
 -- returns success boolean & string
 function GetDiscordUsername(PlayerId, SendAsTable)
 	if PlayerId == nil or PlayerId ~= nil and type(PlayerId) ~= "number" then
-		print("RAMPAGE_Discord_API: PlayerId must be a number and not nil.")
+		print("RAMPAGE_Discord_API - GetDiscordUsername: PlayerId must be a number and not nil.")
 		return false, ""
 	end
 
@@ -328,7 +326,7 @@ end
 -- returns success boolean & string
 function GetGuildIcon(guildAlias)
 	if guildAlias ~= nil and type(guildAlias) ~= "string" and type(guildAlias) ~= "number" then
-		print("RAMPAGE_Discord_API: guildAlias must be a string or number.")
+		print("RAMPAGE_Discord_API - GetGuildIcon: guildAlias must be a string or number.")
 		return false, ""
 	end
 
@@ -340,6 +338,7 @@ function GetGuildIcon(guildAlias)
 	end
 
 	local data = json.decode(guild.data)
+
 	if data.icon:sub(1, 1) and data.icon:sub(2, 2) == "_" then
 		return true, "https://cdn.discordapp.com/icons/" .. Config.GuildId .. "/" .. data.icon .. ".gif"
 	else
@@ -352,7 +351,7 @@ end
 -- returns success boolean & string
 function GetGuildSplash(guildAlias)
 	if guildAlias ~= nil and type(guildAlias) ~= "string" and type(guildAlias) ~= "number" then
-		print("RAMPAGE_Discord_API: guildAlias must be a string or number.")
+		print("RAMPAGE_Discord_API - GetGuildSplash: guildAlias must be a string or number.")
 		return false, ""
 	end
 
@@ -392,7 +391,7 @@ end
 -- returns success boolean & string
 function GetGuildDescription(guildAlias)
 	if guildAlias ~= nil and type(guildAlias) ~= "string" and type(guildAlias) ~= "number" then
-		print("RAMPAGE_Discord_API: guildAlias must be a string or number.")
+		print("RAMPAGE_Discord_API - GetGuildDescription: guildAlias must be a string or number.")
 		return false, ""
 	end
 
@@ -412,7 +411,7 @@ end
 -- returns success boolean & count
 function GetGuildMemberCount(guildAlias)
 	if guildAlias ~= nil and type(guildAlias) ~= "string" and type(guildAlias) ~= "number" then
-		print("RAMPAGE_Discord_API: guildAlias must be a string or number.")
+		print("RAMPAGE_Discord_API - GetGuildMemberCount: guildAlias must be a string or number.")
 		return false, 0
 	end
 
@@ -432,7 +431,7 @@ end
 -- returns success boolean & count
 function GetGuildOnlineMemberCount(guildAlias)
 	if guildAlias ~= nil and type(guildAlias) ~= "string" and type(guildAlias) ~= "number" then
-		print("RAMPAGE_Discord_API: guildAlias must be a string or number.")
+		print("RAMPAGE_Discord_API - GetGuildOnlineMemberCount: guildAlias must be a string or number.")
 		return false, 0
 	end
 
@@ -452,7 +451,7 @@ end
 -- returns success boolean & image url
 function GetDiscordAvatar(PlayerId)
 	if PlayerId == nil or PlayerId ~= nil and type(PlayerId) ~= "number" then
-		print("RAMPAGE_Discord_API: PlayerId must be a number and not nil.")
+		print("RAMPAGE_Discord_API - GetDiscordAvatar: PlayerId must be a number and not nil.")
 		return false, ""
 	end
 
@@ -501,12 +500,12 @@ end
 -- returns boolean & role name
 function GetRoleNameFromRoleId(roleId, guildAlias)
 	if roleId == nil or roleId ~= nil and type(roleId) ~= "number" then
-		print("RAMPAGE_Discord_API: roleId must be a number and not nil.")
+		print("RAMPAGE_Discord_API - GetRoleNameFromRoleId: roleId must be a number and not nil.")
 		return false, ""
 	end
 
 	if guildAlias ~= nil and type(guildAlias) ~= "string" and type(guildAlias) ~= "number" then
-		print("RAMPAGE_Discord_API: guildAlias must be a string or number.")
+		print("RAMPAGE_Discord_API - GetRoleNameFromRoleId: guildAlias must be a string or number.")
 		return false, ""
 	end
 
@@ -514,7 +513,7 @@ function GetRoleNameFromRoleId(roleId, guildAlias)
 	local s, roles = false, {}
 
 	if Config.UseCache and DataCache.RoleList[guildId] ~= nil then
-		roles = DataCache.RoleList[guildId][roleName]
+		roles = DataCache.RoleList[guildId]
 	else
 		s, roles = GetGuildRoleList(guild)
 
@@ -528,7 +527,7 @@ function GetRoleNameFromRoleId(roleId, guildAlias)
 			return true, name
 		end
 	end
-	
+
 	return false, ""
 end
 
@@ -537,17 +536,17 @@ end
 -- returns boolean & roleid
 function GetRoleIdFromRoleName(roleName, guildAlias)
 	if roleName == nil then
-		print("RAMPAGE_Discord_API: roleName must be a string and not nil.")
+		print("RAMPAGE_Discord_API - GetRoleIdFromRoleName: roleName must be a string and not nil.")
 		return false, 1
 	end
 
 	if type(roleName) ~= "string" then
-		print("RAMPAGE_Discord_API: roleName must be a string.")
+		print("RAMPAGE_Discord_API - GetRoleIdFromRoleName: roleName must be a string.")
 		return false, 1
 	end
 
 	if guildAlias ~= nil and type(guildAlias) ~= "string" and type(guildAlias) ~= "number" then
-		print("RAMPAGE_Discord_API: guildAlias must be a string or number.")
+		print("RAMPAGE_Discord_API - GetRoleIdFromRoleName: guildAlias must be a string or number.")
 		return false, 1
 	end
 
@@ -575,7 +574,7 @@ end
 -- returns boolean & roleid
 function FetchRoleId(RoleId, guildAlias)
 	print(
-		"RAMPAGE_Discord_API: FetchRoleId has been deprecated in RAMPAGE Discord API v3, please use GetRoleIdFromRoleName."
+		"RAMPAGE_Discord_API - FetchRoleId: FetchRoleId has been deprecated in RAMPAGE Discord API v3, please use GetRoleIdFromRoleName."
 	)
 	return GetRoleIdFromRoleName(RoleId, guildAlias)
 end
@@ -585,17 +584,17 @@ end
 -- returns boolean
 function CheckEqual(role1, role2, guildAlias)
 	if role1 == nil or role1 ~= nil and type(role1) ~= "number" then
-		print("RAMPAGE_Discord_API: role1 must be a number and not nil.")
+		print("RAMPAGE_Discord_API - CheckEqual: role1 must be a number and not nil.")
 		return false
 	end
 
 	if role2 == nil or role2 ~= nil and type(role2) ~= "number" then
-		print("RAMPAGE_Discord_API: role2 must be a number and not nil.")
+		print("RAMPAGE_Discord_API - CheckEqual: role2 must be a number and not nil.")
 		return false
 	end
 
 	if guildAlias ~= nil and type(guildAlias) ~= "string" and type(guildAlias) ~= "number" then
-		print("RAMPAGE_Discord_API: guildAlias must be a string or number.")
+		print("RAMPAGE_Discord_API - CheckEqual: guildAlias must be a string or number.")
 		return false
 	end
 

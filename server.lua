@@ -542,11 +542,15 @@ function GetRoleIdFromRoleName(roleName, guildAlias)
 
 	if type(roleName) ~= "string" then
 		print("RAMPAGE_Discord_API - GetRoleIdFromRoleName: roleName must be a string.")
+		print("(roleName) Got type: " .. type(roleName))
+		print("(roleName) Got value: " .. roleName)
 		return false, 1
 	end
 
 	if guildAlias ~= nil and type(guildAlias) ~= "string" and type(guildAlias) ~= "number" then
 		print("RAMPAGE_Discord_API - GetRoleIdFromRoleName: guildAlias must be a string or number.")
+		print("(guildAlias) Got type: " .. type(guildAlias))
+		print("(guildAlias) Got value: " .. guildAlias)
 		return false, 1
 	end
 
@@ -576,6 +580,7 @@ function FetchRoleId(RoleId, guildAlias)
 	print(
 		"RAMPAGE_Discord_API - FetchRoleId: FetchRoleId has been deprecated in RAMPAGE Discord API v3, please use GetRoleIdFromRoleName."
 	)
+	
 	return GetRoleIdFromRoleName(RoleId, guildAlias)
 end
 

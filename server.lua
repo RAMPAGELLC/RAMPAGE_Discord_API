@@ -675,14 +675,14 @@ AddEventHandler("RAMPAGE_Discord_API:LoadPlayer", function()
 				local removed = {}
 
 				for _, roleId in pairs(roles) do
-					if not has_value(DataCache.UserRoles[discordId], roleId) then
+					if roleId ~= nil and  not has_value(DataCache.UserRoles[discordId], roleId) then
 						local suc, name = GetRoleNameFromRoleId(roleId)
 						table.insert(added, suc and name or roleId)
 					end
 				end
 
 				for _, roleId in pairs(DataCache.UserRoles[discordId]) do
-					if not has_value(roles, roleId) then
+					if roleId ~= nil and not has_value(roles, roleId) then
 						local suc, name = GetRoleNameFromRoleId(roleId)
 						table.insert(removed, suc and name or roleId)
 					end

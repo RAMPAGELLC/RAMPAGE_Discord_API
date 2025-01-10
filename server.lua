@@ -496,11 +496,11 @@ function GetDiscordAvatar(PlayerId)
 end
 
 -- Public Function
--- @exports["RAMPAGE_Discord_API"]:GetRoleNameFromRoleId(roleId: number, guildAlias: string | number (optional))
+-- @exports["RAMPAGE_Discord_API"]:GetRoleNameFromRoleId(roleId: number | string, guildAlias: string | number (optional))
 -- returns boolean & role name
 function GetRoleNameFromRoleId(roleId, guildAlias)
-	if roleId == nil or roleId ~= nil and type(roleId) ~= "number" then
-		print("RAMPAGE_Discord_API - GetRoleNameFromRoleId: roleId must be a number and not nil.")
+	if roleId == nil or roleId ~= nil and (type(roleId) ~= "number" and type(roleId) ~= "string") then
+		print("RAMPAGE_Discord_API - GetRoleNameFromRoleId: roleId must be a number or string and not nil.")
 		return false, ""
 	end
 
